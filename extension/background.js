@@ -2,6 +2,7 @@
 // @version 0.22.0
 /* global handleCookies, handleSetCookie */
 /* global handleRemoveCookie, handleClearCookies */
+/* exported postResult */
 
 const VERSION = '0.22.0';
 // No default server. A bridge URL is deployment-specific, and a build that
