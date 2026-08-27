@@ -200,7 +200,9 @@ async function runBlockRuleRestart() {
   // A restarted worker re-reads the shipped script with a zeroed counter while
   // the session rules it installed earlier are still present.
   const restarted = makeContext();
-  vm.runInContext(fs.readFileSync(backgroundPath, 'utf8'), restarted);
+  vm.runInContext(
+    fs.readFileSync(backgroundPath, 'utf8'), restarted,
+    { filename: backgroundPath });
   await vm.runInContext('loadConfig()', restarted);
   restarted.blockCommand = {
     id: 'block-after-restart',
@@ -268,7 +270,9 @@ async function runDedupAcrossRestart() {
   // A fresh worker instance over the SAME extension storage, which is what an
   // MV3 restart is.
   const restarted = makeContext();
-  vm.runInContext(fs.readFileSync(backgroundPath, 'utf8'), restarted);
+  vm.runInContext(
+    fs.readFileSync(backgroundPath, 'utf8'), restarted,
+    { filename: backgroundPath });
   await vm.runInContext('loadConfig()', restarted);
   vm.runInContext(deliver, restarted);
   for (let turn = 0; turn < 6; turn++) await settle();
@@ -359,7 +363,9 @@ async function runFetchBound() {
 }
 
 async function run() {
-  vm.runInContext(fs.readFileSync(backgroundPath, 'utf8'), context);
+  vm.runInContext(
+    fs.readFileSync(backgroundPath, 'utf8'), context,
+    { filename: backgroundPath });
   await vm.runInContext('loadConfig()', context);
   if (scenario === 'capacity') return runCapacity();
   if (scenario === 'expiry') return runExpiry();

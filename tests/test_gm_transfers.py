@@ -76,8 +76,12 @@ const context = {
   console: { log() {}, error() {} },
 };
 context.globalThis = context;
-vm.runInNewContext(fs.readFileSync(contentPath, 'utf8'), context);
-vm.runInNewContext(fs.readFileSync(pagePath, 'utf8'), context);
+vm.runInNewContext(
+  fs.readFileSync(contentPath, 'utf8'), context,
+  { filename: contentPath });
+vm.runInNewContext(
+  fs.readFileSync(pagePath, 'utf8'), context,
+  { filename: pagePath });
 
 function flushMessages() {
   let guard = 0;
@@ -252,8 +256,12 @@ const context = {
   console: { log() {}, error() {} },
 };
 context.globalThis = context;
-vm.runInNewContext(fs.readFileSync(contentPath, 'utf8'), context);
-vm.runInNewContext(fs.readFileSync(pagePath, 'utf8'), context);
+vm.runInNewContext(
+  fs.readFileSync(contentPath, 'utf8'), context,
+  { filename: contentPath });
+vm.runInNewContext(
+  fs.readFileSync(pagePath, 'utf8'), context,
+  { filename: pagePath });
 
 function flushMessages() {
   let guard = 0;
@@ -393,8 +401,12 @@ const context = {
   setTimeout: () => 1,
   console: { log() {}, error() {} },
 };
-vm.runInNewContext(fs.readFileSync(contentPath, 'utf8'), context);
-vm.runInNewContext(fs.readFileSync(pagePath, 'utf8'), context);
+vm.runInNewContext(
+  fs.readFileSync(contentPath, 'utf8'), context,
+  { filename: contentPath });
+vm.runInNewContext(
+  fs.readFileSync(pagePath, 'utf8'), context,
+  { filename: pagePath });
 
 function flushMessages() {
   while (messages.length) {

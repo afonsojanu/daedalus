@@ -172,7 +172,9 @@ async function waitForResultConsume() {
 
 (async () => {
   step('the worker script to initialize');
-  vm.runInContext(fs.readFileSync(backgroundPath, 'utf8'), context);
+  vm.runInContext(
+    fs.readFileSync(backgroundPath, 'utf8'), context,
+    { filename: backgroundPath });
   const configLabel = 'the worker to load its config';
   step(configLabel);
   await bounded(
