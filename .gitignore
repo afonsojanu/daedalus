@@ -225,6 +225,7 @@
 !/tests/test_gm_storage.py
 !/tests/test_gm_transfers.py
 !/tests/test_mcp_server.py
+!/tests/test_mcp_transport.py
 !/tests/test_overlap_harness.py
 !/tests/test_path_safety.py
 !/tests/test_real_browser_eval.py
