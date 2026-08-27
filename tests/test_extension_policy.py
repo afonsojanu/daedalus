@@ -67,11 +67,11 @@ def test_every_capture_limit_boundary_agrees_on_one_range(tmp):
                 for m in re.finditer(r'NET_CAPTURE_MAX = (\d+)',
                                      path.read_text(encoding='utf-8'))]
     assert len(declared) == 1, f'expected one CLI declaration, found {declared}'
-    mcp = (_util.ROOT / 'mcp_server.py').read_text(encoding='utf-8')
+    mcp = (_util.ROOT / 'mcp_tools_network.py').read_text(encoding='utf-8')
 
     ceilings = {
         'background.js': re.search(r'NET_CAPTURE_MAX = (\d+)', background),
-        'mcp_server.py': re.search(r'NET_CAPTURE_MAX = (\d+)', mcp),
+        'mcp_tools_network.py': re.search(r'NET_CAPTURE_MAX = (\d+)', mcp),
     }
     missing = sorted(name for name, m in ceilings.items() if m is None)
     assert not missing, f'no capture ceiling declared in: {missing}'
