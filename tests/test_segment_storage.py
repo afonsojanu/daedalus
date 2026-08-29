@@ -515,6 +515,39 @@ def test_a_recount_reconciles_and_clears_the_mark_before_a_rejection(tmp):
         assert not dirty_path.exists(), 'mark should have cleared on reconcile'
 
 
+def test_a_transient_sharing_violation_on_the_temp_write_is_retried(tmp):
+    """The first write of a segment's .ts.tmp raises PermissionError once,
+    the identical write succeeds on retry, and the segment lands instead
+    of being discarded as an unrecoverable storage failure (#328).
+    """
+    fault_dir = Path(tmp) / 'fault-injection'
+    fault_dir.mkdir()
+    (fault_dir / 'sitecustomize.py').write_text(
+        'import pathlib\n'
+        '_real_write_bytes = pathlib.Path.write_bytes\n'
+        '_raised = [False]\n'
+        'def _flaky_segment_write(path, data):\n'
+        '    if path.name.endswith(".ts.tmp") and not _raised[0]:\n'
+        '        _raised[0] = True\n'
+        '        raise PermissionError(32, "The process cannot access '
+        'the file")\n'
+        '    return _real_write_bytes(path, data)\n'
+        'pathlib.Path.write_bytes = _flaky_segment_write\n',
+        encoding='utf-8')
+    env = {'PYTHONPATH': str(fault_dir)}
+    with _util.bridge(tmp, env=env) as (base, docroot):
+        job = seg_job()
+        _, minted = mint_job(base, TOK, job)
+        sig = minted['sig']
+        status0, body0 = post_segment(base, job, sig, '0', payload=b'abc')
+        status1, body1 = post_segment(base, job, sig, '1', payload=b'de')
+        assert status0 == 200, (status0, body0)
+        assert status1 == 200, (status1, body1)
+        seg_dir = Path(docroot) / 'segments' / job
+        stored = sorted(path.name for path in seg_dir.glob('*.ts'))
+        assert stored == ['000000.ts', '000001.ts'], stored
+
+
 def main():
     return _util.runner(_util.collect(globals()), tmp_prefix='segstorage_')
 

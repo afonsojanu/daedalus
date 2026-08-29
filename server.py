@@ -1490,7 +1490,8 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json(
                         500, {'error': 'segment storage failure'})
                 try:
-                    tmp.write_bytes(raw)
+                    atomic_file.retry_sharing_violation(
+                        lambda: tmp.write_bytes(raw))
                     atomic_file.replace_atomically(tmp, final)
                 finally:
                     try:
@@ -1691,7 +1692,9 @@ class Handler(BaseHTTPRequestHandler):
                     'stored_bytes': stored_bytes,
                 }
                 try:
-                    tmp.write_text(json.dumps(record), encoding='utf-8')
+                    atomic_file.retry_sharing_violation(
+                        lambda: tmp.write_text(
+                            json.dumps(record), encoding='utf-8'))
                     atomic_file.replace_atomically(tmp, record_path)
                 except OSError:
                     try:
@@ -1716,7 +1719,9 @@ class Handler(BaseHTTPRequestHandler):
             made_dir = not job_dir.exists()
             try:
                 job_dir.mkdir(parents=True, exist_ok=True)
-                tmp.write_text(json.dumps(record), encoding='utf-8')
+                atomic_file.retry_sharing_violation(
+                    lambda: tmp.write_text(
+                        json.dumps(record), encoding='utf-8'))
                 atomic_file.replace_atomically(tmp, record_path)  # publish
             except OSError:
                 # Job names may contain dots, so the flat namespace collides
